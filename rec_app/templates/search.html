@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Search Products{% endblock %}
+
+{% block content %}
+<h1>Search Products</h1>
+
+<form id="search-form">
+    <input type="text" id="search-input" placeholder="Type product name..." autocomplete="off">
+    <button type="submit">Search</button>
+</form>
+
+<div id="search-results">
+    <!-- Results will appear here -->
+</div>
+
+<style>
+    #search-results {
+        margin-top: 20px;
+    }
+    .product-card {
+        display: flex;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .product-card img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-right: 10px;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const input = document.getElementById("search-input");
+    const resultsDiv = document.getElementById("search-results");
+    const form = document.getElementById("search-form");
+
+    function renderResults(products) {
+        resultsDiv.innerHTML = "";
+        if (products.length === 0) {
+            resultsDiv.innerHTML = "<p>No results found.</p>";
+            return;
+        }
+
+        products.forEach(p => {
+            const card = document.createElement("div");
+            card.classList.add("product-card");
+            card.innerHTML = `
+                <img src="${p.imgUrl}" alt="${p.title}">
+                <div>
+                    <h4>${p.title}</h4>
+                    <p>Category: ${p.category}</p>
+                    <p>Price: $${p.price}</p>
+                </div>
+            `;
+            resultsDiv.appendChild(card);
+        });
+    }
+
+    async function fetchResults(query) {
+        if (!query) {
+            resultsDiv.innerHTML = "";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/ajax_search/?query=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            renderResults(data.results);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // Instant search on input
+    input.addEventListener("input", () => {
+        const query = input.value.trim();
+        fetchResults(query);
+    });
+
+    // Optional: prevent default form submit
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+        fetchResults(input.value.trim());
+    });
+});
+</script>
+
+{% endblock %}

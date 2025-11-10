@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Top 50 Trending Products{% endblock %}
+
+{% block content %}
+    <h1>Top 50 Trending Products</h1>
+    <p>These are the first 50 items in our processed dataset, representing a list of popular items.</p>
+
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Image</th>
+                <th>ASIN</th>
+                <th>Product Title</th>
+                <th>Category</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in trending_products %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    {% if product.imgUrl %}
+                        <img src="{{ product.imgUrl }}" alt="{{ product.title }}" width="80">
+                    {% else %}
+                        No Image
+                    {% endif %}
+                </td>
+                <td>{{ product.asin }}</td>
+                <td>{{ product.title }}</td>
+                <td>{{ product.category_name }}</td>
+                <td>${{ product.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
